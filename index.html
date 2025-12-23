@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11-Section Parallax Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { 
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+            overscroll-behavior-x: contain;
+        }
+        
+        .parallax-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 400%; /* Massive width for 11 sections */
+            height: 100%;
+            z-index: -1;
+            background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2500&q=80');
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.3) saturate(1.2);
+            will-change: transform;
+        }
+
+        /* Animation States */
+        .reveal-text {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .active .reveal-text {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .active .reveal-text.delay-1 { transition-delay: 0.15s; }
+        .active .reveal-text.delay-2 { transition-delay: 0.3s; }
+
+        .scroll-container {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-black text-white overflow-hidden">
+
+    <div id="parallaxBg" class="parallax-bg"></div>
+
+    <button id="prevBtn" class="fixed left-6 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 p-4 rounded-full backdrop-blur-xl transition-all opacity-0 pointer-events-none border border-white/10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    
+    <button id="nextBtn" class="fixed right-6 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 p-4 rounded-full backdrop-blur-xl transition-all border border-white/10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+
+    <div id="indicators" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 flex gap-2 px-4 py-2 bg-black/40 backdrop-blur-md rounded-full border border-white/10"></div>
+
+    <main id="container" class="flex overflow-x-auto snap-x snap-mandatory no-scrollbar h-screen w-screen scroll-container">
+        
+        <script>
+            const sectionData = [
+                { title: "The Beginning", text: "<a href='haha.com'>Welcome to the first chapter of our 11-part journey.</a>" },
+                { title: "The Vision", text: "Look ahead at the horizons we've yet to reach." },
+                { title: "Innovation", text: "Breaking the boundaries of traditional web design." },
+                { title: "The Core", text: "Deep diving into the structure of the system." },
+                { title: "Dynamics", text: "Motion and fluidity defined in every swipe." },
+                { title: "Atmosphere", text: "Creating depth with multi-layered parallax effects." },
+                { title: "Perspective", text: "Seeing the world from a different angle." },
+                { title: "Evolution", text: "How we adapt to the changing digital landscape." },
+                { title: "The Flow", text: "Seamless transitions between ideas and sections." },
+                { title: "Synergy", text: "Where technology and design meet in harmony." },
+                { title: "The End", text: "You've completed the full 11-section experience." }
+            ];
+
+            const container = document.getElementById('container');
+            sectionData.forEach((data, i) => {
+                const section = document.createElement('section');
+                section.className = "snap-start min-w-full h-full overflow-y-auto p-10 flex flex-col items-center justify-center relative";
+                section.innerHTML = `
+                    <div class="max-w-3xl text-center">
+                        <span class="reveal-text block text-blue-400 font-mono tracking-widest mb-4 uppercase">Part ${i + 1} of 11</span>
+                        <h1 class="reveal-text delay-1 text-7xl md:text-8xl font-black uppercase tracking-tighter mb-6">${data.title}</h1>
+                        <p class="reveal-text delay-2 text-xl md:text-2xl opacity-60 max-w-xl mx-auto">${data.text}</p>
+                        ${i === 10 ? '<button class="reveal-text delay-2 mt-12 px-10 py-4 bg-white text-black font-bold rounded-full">Restart Journey</button>' : ''}
+                    </div>
+                `;
+                if(i === 10) {
+                    section.querySelector('button').onclick = () => container.scrollTo({left: 0, behavior: 'smooth'});
+                }
+                container.appendChild(section);
+            });
+        </script>
+
+    </main>
+
+    <script>
+        const scrollContainer = document.getElementById('container');
+        const parallaxBg = document.getElementById('parallaxBg');
+        const sections = document.querySelectorAll('section');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const indicatorsContainer = document.getElementById('indicators');
+
+        // 1. Optimized Parallax (Moving the background slower across 11 sections)
+        scrollContainer.addEventListener('scroll', () => {
+            const scrollPercent = scrollContainer.scrollLeft / (scrollContainer.scrollWidth - scrollContainer.clientWidth);
+            // Move background by 50% of its total width over the course of the whole scroll
+            parallaxBg.style.transform = `translateX(-${scrollPercent * 50}%)`;
+        });
+
+        // 2. Navigation Dots
+        sections.forEach((_, i) => {
+            const dot = document.createElement('div');
+            dot.className = `w-1.5 h-1.5 rounded-full bg-white/20 transition-all duration-500`;
+            indicatorsContainer.appendChild(dot);
+        });
+
+        nextBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: window.innerWidth, behavior: 'smooth' }));
+        prevBtn.addEventListener('click', () => scrollContainer.scrollBy({ left: -window.innerWidth, behavior: 'smooth' }));
+
+        // 3. Animation & UI Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                const index = Array.from(sections).indexOf(entry.target);
+                const dots = indicatorsContainer.querySelectorAll('div');
+
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    dots[index].classList.add('bg-white', 'scale-150');
+                    dots[index].classList.remove('bg-white/20');
+
+                    // Button visibility
+                    prevBtn.style.opacity = index === 0 ? '0' : '1';
+                    prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
+                    nextBtn.style.opacity = index === sections.length - 1 ? '0' : '1';
+                    nextBtn.style.pointerEvents = index === sections.length - 1 ? 'none' : 'auto';
+                } else {
+                    entry.target.classList.remove('active');
+                    dots[index].classList.remove('bg-white', 'scale-150');
+                    dots[index].classList.add('bg-white/20');
+                }
+            });
+        }, { root: scrollContainer, threshold: 0.6 });
+
+        sections.forEach(section => observer.observe(section));
+    </script>
+</body>
+</html>
